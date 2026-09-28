@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>C++ Master - Aprendizaje Gamificado</title>
+  <link rel="stylesheet" href="styles.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+
+  <!-- BARRA DE GAMIFICACIÓN -->
+  <header class="gamification-bar">
+    <div class="user-stat"><i class="fas fa-fire streak-icon"></i> <span id="streakCount">5</span> Racha</div>
+    <div class="user-stat"><i class="fas fa-bolt xp-icon"></i> <span id="xpCount">350</span> XP</div>
+    <div class="user-stat"><i class="fas fa-award badge-icon"></i> <span id="badgeCount">2</span> Medallas</div>
+  </header>
+
+  <!-- VISTA 1: RUTA Y MAPA DEL CURSO -->
+  <div id="mapView" class="view-container">
+    <div class="map-header">
+      <h1 id="sectionTitle">Sección 1: Introducción</h1>
+      <p id="sectionSubtitle">Aprende C++ paso a paso</p>
+    </div>
+
+    <div class="path-container" id="nodesPath">
+      <!-- Nodos generados por JavaScript -->
+    </div>
+
+    <div class="floating-nav">
+      <button onclick="prevSection()" class="nav-btn"><i class="fas fa-arrow-left"></i></button>
+      <span id="sectionCounter">Sección 1 de 4</span>
+      <button onclick="nextSection()" class="nav-btn"><i class="fas fa-arrow-right"></i></button>
+    </div>
+  </div>
+
+  <!-- VISTA 2: ÁREA DE LECCIÓN Y EDITOR INTERACTIVO -->
+  <div id="lessonView" class="view-container hidden">
+    <!-- Pestañas Superiores -->
+    <nav class="top-tabs">
+      <button id="btn-tab-reference" class="tab-btn active" onclick="switchTab('reference')"><i class="fas fa-book"></i> Teoría</button>
+      <button id="btn-tab-quiz" class="tab-btn" onclick="switchTab('quiz')"><i class="fas fa-list-check"></i> Cuestionario (20/20)</button>
+      <button id="btn-tab-challenge" class="tab-btn" onclick="switchTab('challenge')"><i class="fas fa-flag"></i> Desafío</button>
+      <button id="btn-tab-code" class="tab-btn" onclick="switchTab('code')"><i class="fas fa-terminal"></i> Consola / Editor</button>
+      <button id="btn-tab-solution" class="tab-btn" onclick="switchTab('solution')"><i class="fas fa-key"></i> Solución</button>
+      <button class="close-btn" onclick="closeLesson()">&times;</button>
+    </nav>
+
+    <main class="tab-content">
+      <!-- Pestaña 1: Teoría -->
+      <section id="tab-reference" class="tab-pane">
+        <div class="theory-box">
+          <h2 id="refTitle">Título de la Lección</h2>
+          <div id="referenceText" class="theory-body"></div>
+          <button class="action-btn" onclick="switchTab('quiz')">Ir al Cuestionario <i class="fas fa-arrow-right"></i></button>
+        </div>
+      </section>
+
+      <!-- Pestaña 2: Cuestionario de 20 preguntas -->
+      <section id="tab-quiz" class="tab-pane hidden">
+        <div class="quiz-box">
+          <div class="quiz-header-status">
+            <span id="quizQuestionCounter">Pregunta 1 de 20</span>
+            <span id="quizScoreCounter">Aciertos: 0/20</span>
+          </div>
+          <h3 id="quizQuestionText">Texto de la pregunta...</h3>
+          <div id="quizOptionsList" class="quiz-options-grid"></div>
+
+          <!-- Retroalimentación explicativa -->
+          <div id="quizFeedback" class="quiz-feedback hidden">
+            <div id="feedbackTitle" class="feedback-title"></div>
+            <p id="feedbackText" class="feedback-text"></p>
+            <button id="nextQuestionBtn" class="action-btn" onclick="nextQuestion()">Siguiente Pregunta <i class="fas fa-arrow-right"></i></button>
+          </div>
+        </div>
+      </section>
+
+      <!-- Pestaña 3: Desafío de Código -->
+      <section id="tab-challenge" class="tab-pane hidden">
+        <div class="challenge-header">
+          <h2 id="challengeTitle">Desafío Práctico</h2>
+          <span id="difficultyBadge" class="badge badge-basic">Nivel Básico</span>
+        </div>
+        <div class="challenge-desc" id="challengeDescription"></div>
+
+        <!-- Botón solicitado: Ir a la consola directamente -->
+        <div class="console-jump-box">
+          <button class="jump-console-btn" onclick="switchTab('code')">
+            <i class="fas fa-terminal"></i> Ir a la Consola de Código
+          </button>
+        </div>
+
+        <div class="hints-container">
+          <button class="hint-btn" onclick="revealNextHint()">
+            <i class="fas fa-lightbulb"></i> Solicitar Pista (<span id="hintCount">0</span>/3)
+          </button>
+          <div id="hintsList" class="hints-list"></div>
+        </div>
+      </section>
+
+      <!-- Pestaña 4: Editor & Consola -->
+      <section id="tab-code" class="tab-pane hidden">
+        <div class="test-cases-panel">
+          <div class="panel-header">
+            <span class="panel-label">EVALUACIÓN Y CASOS DE PRUEBA</span>
+            <span id="testStatus" class="test-status">Sin ejecutar</span>
+          </div>
+          <div id="testResults" class="test-results-box">
+            Presiona "Run / Submit" para compilar y evaluar tu código.
+          </div>
+        </div>
+
+        <div class="editor-header">
+          <span class="sub-tab-label"><i class="fas fa-code"></i> CONSOLA C++</span>
+          <button class="reset-btn" onclick="resetCode()"><i class="fas fa-undo"></i> Reiniciar</button>
+        </div>
+
+        <textarea id="codeEditor" class="code-editor" spellcheck="false"></textarea>
+
+        <div class="editor-footer">
+          <button class="ai-ask-btn" onclick="askBugsy()">
+            <i class="fas fa-robot"></i> Bugsy (Tutor IA)
+          </button>
+          <button class="run-btn" onclick="runCode()"><i class="fas fa-play"></i> Run / Submit</button>
+        </div>
+      </section>
+
+      <!-- Pestaña 5: Solución -->
+      <section id="tab-solution" class="tab-pane hidden">
+        <h3>Solución Recomendada</h3>
+        <p class="solution-info">Usa esta pestaña como referencia únicamente cuando te atasques.</p>
+        <pre><code id="solutionCode">// Solución oficial</code></pre>
+      </section>
+
+      <!-- Panel Flotante Tutor IA (Bugsy) -->
+      <div id="bugsyModal" class="bugsy-box hidden">
+        <div class="bugsy-header">
+          <span><i class="fas fa-robot"></i> Bugsy - Tutor IA</span>
+          <span onclick="toggleBugsy()" class="close-bugsy">&times;</span>
+        </div>
+        <div class="bugsy-body" id="bugsyResponse">
+          ¡Hola! Soy Bugsy. Analizaré tu código para ayudarte.
+        </div>
+      </div>
+    </main>
+
+    <!-- Modal de Éxito -->
+    <div id="successModal" class="modal hidden">
+      <div class="modal-content">
+        <div class="success-icon" id="successIcon"><i class="fas fa-check-circle"></i></div>
+        <h2 id="successTitle">¡Subtema Completado!</h2>
+        <p id="successXpMessage">+50 XP ganados</p>
+        <button class="continue-btn" onclick="nextChallenge()">CONTINUAR</button>
+      </div>
+    </div>
+  </div>
+
+  <script src="app.js"></script>
+</body>
+</html>
